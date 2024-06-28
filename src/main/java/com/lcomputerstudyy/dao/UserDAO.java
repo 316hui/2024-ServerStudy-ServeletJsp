@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import com.lcomputerstudyy.database.DBConnection;
 import com.lcomputerstudyy.vo.Pagination;
@@ -186,16 +187,15 @@ public class UserDAO {
 		ResultSet rs = null;
 		int count = 0;
 		Search search = pagination.getSearch();
-		String where = "WHERE 1=1 ";
 		
 		try {
-			String query = "SELECT COUNT(*) count FROM user " + where;
+			String query = "SELECT COUNT(*) count FROM user ";
 			
-			//System.out.println("categoryyy : " + search.getCategory());
-			System.out.println("keywordddd : " + search.getKeyword());
-			if (!search.getCategory().equals("") && !search.getKeyword().equals("")) {
-		            where += "AND " + search.getCategory() + " LIKE '%" + search.getKeyword() + "%'";
-		        }
+			if (search.getCategory() != null && !search.getCategory().isEmpty()) {
+				if(search.getKeyword() != null && !search.getKeyword().isEmpty()) {
+					query += "WHERE" + search.getCategory() + " LIKE '%" + search.getKeyword();
+				}
+			}
 			System.out.println("query!!!!!: " + query);
 			
 			//검색어가 있는 경우 해당 값만 가져와서 유저수 보내주기. 
@@ -232,9 +232,13 @@ public class UserDAO {
 		Search search = pagination.getSearch();
 		String where = "WHERE 1=1 ";
 		
+		//Optional<String> optCategory = Optional.ofNullable(search.getCategory());
+		//optCategory.ifPresent((c) -> );
 		
-		if (search.getCategory() != "" && search.getKeyword() != "") {
-			where += "AND " + search.getCategory() + " LIKE '%" + search.getKeyword() + "%'";
+		if (search.getCategory() != null && !search.getCategory().equals("")) {
+			if (search.getKeyword() != null && search.getKeyword().equals("")) {
+				where += "AND " + search.getCategory() + " LIKE '%" + search.getKeyword() + "%'";
+			}
 		}
 		
 		try {
@@ -247,12 +251,12 @@ public class UserDAO {
 					.append(where)
 					.append("LIMIT			?, ?\n")
 					.toString();
-
 			pstmt = conn.prepareStatement(query);
 			pstmt.setInt(1, pagination.getPageNum());
 			//System.out.println("페이지네이션 페이지넘 "+ pagination.getPageNum());
 			pstmt.setInt(2, pagination.getPageNum());
 			pstmt.setInt(3, Pagination.perPage);
+			//pstmt.setString(4, "%"+search.getKeyword()+"%");
 			rs = pstmt.executeQuery();
 			list = new ArrayList<User>();
 			
