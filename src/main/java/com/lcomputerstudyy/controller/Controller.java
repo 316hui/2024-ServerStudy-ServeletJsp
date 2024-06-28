@@ -57,7 +57,7 @@ public class Controller extends HttpServlet {
 			
 			Pagination pagination = new Pagination();
 			pagination.setPage(page);
-			pagination.setCount(count);
+			pagination.setCount(count); //abc
 			pagination.build();
 			pagination.setSearch(search); 
 			count = userService.getUsersCount(pagination);//카테고리, 키워드 넣은 서치 포함시키기
