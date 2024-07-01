@@ -47,6 +47,9 @@ public class UserService {
 	public ArrayList<User> getUsers(Pagination pagination) {
 		return dao.getUsers(pagination);
 	}
+	public User loginUser(String idx, String pw) {
+		return dao.loginUser(idx, pw);
+	}
 	
 
 //	public ArrayList<User> searchUsers(String category, String keyword, Pagination pagination) {

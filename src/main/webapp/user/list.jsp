@@ -62,11 +62,11 @@
 <!-- 검색 폼 -->
 <div class="search-container">
 	<form action="user-list.do" method="get">
-		<select name="1">
-			<option value="category">category</option>
-			<option value="keyword">keyword</option>
+		<select name="category">
+			<option value="1">ID</option>
+			<option value="2">Name</option>
 		</select>
-		<input type="text" name="2" placeholder="검색어 입력">
+		<input type="text" name="keyword" placeholder="검색어 입력">
 		<button type="submit">검색</button>
 	</form>
 

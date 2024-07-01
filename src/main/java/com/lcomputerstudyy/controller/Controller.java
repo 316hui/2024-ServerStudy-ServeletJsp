@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.lcomputerstudyy.service.UserService;
 import com.lcomputerstudyy.vo.Pagination;
@@ -42,6 +43,9 @@ public class Controller extends HttpServlet {
 		User specificUser;
 		int count = 0;
 		
+		String pw = null;
+		String idx = null;
+		
 		switch (command) {
 		case "/user-list.do":
 			
@@ -57,12 +61,15 @@ public class Controller extends HttpServlet {
 			
 			Pagination pagination = new Pagination();
 			pagination.setPage(page);
+			pagination.setSearch(search);
+			count = userService.getUsersCount(pagination);//카테고리, 키워드 넣은 서치 포함시키기
 			pagination.setCount(count); //abc
 			pagination.build();
-			pagination.setSearch(search); 
-			count = userService.getUsersCount(pagination);//카테고리, 키워드 넣은 서치 포함시키기
+		
+			
 			System.out.println("유저 수 : " + count);
 			ArrayList<User> list = userService.getUsers(pagination);
+			System.out.println("유저 리스트 : " + list);
 			
 			request.setAttribute("list", list);
 			request.setAttribute("pagination", pagination);
@@ -127,7 +134,32 @@ public class Controller extends HttpServlet {
 			
 			view = "user/delete";
 			break;
+			
+		case "/user-login.do" :
+			view = "user/login";
+			break;
+		
+		case "/user-login/process.do" :
+			idx = request.getParameter("login_id");
+			pw = request.getParameter("login_password");
+			
+			userService = UserService.getInstance();
+			user = userService.loginUser(idx, pw);
+			
+			if(user != null) {
+				HttpSession session = request.getSession();
+				session.setAttribute("user", user);
+				
+				view = "user/login-result";
+			} else {
+				view = "user/login-fail";
+			}
+			
+			break;
 		}
+		
+		
+			
 		
 		RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");
 		rd.forward(request, response);

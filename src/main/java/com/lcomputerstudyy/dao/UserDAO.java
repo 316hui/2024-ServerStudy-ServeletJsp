@@ -187,22 +187,37 @@ public class UserDAO {
 		ResultSet rs = null;
 		int count = 0;
 		Search search = pagination.getSearch();
+		String category = null;
+		Boolean isThereSearch = false;
+	
 		
 		try {
 			String query = "SELECT COUNT(*) count FROM user ";
 			
 			if (search.getCategory() != null && !search.getCategory().isEmpty()) {
 				if(search.getKeyword() != null && !search.getKeyword().isEmpty()) {
-					query += "WHERE" + search.getCategory() + " LIKE '%" + search.getKeyword();
+					isThereSearch = true;
+					
+					switch (search.getCategory()) {
+						case "1" : 
+							category = "u_id";
+							break;
+						case "2" :
+							category = "u_name";
+							break;
+					}
+					query += "WHERE " + category + " LIKE ?";
+					
+					System.out.println("logggg : " + "getUsersCount 거침");
 				}
 			}
-			System.out.println("query!!!!!: " + query);
 			
-			//검색어가 있는 경우 해당 값만 가져와서 유저수 보내주기. 
-			//sql 툴 사용해서 점검 후 넣기.
 			conn = DBConnection.getConnection();
 			
 			pstmt = conn.prepareStatement(query);
+			if (isThereSearch == true) {		//sql injection 방지. 키워드는 쿼리에 직접 넣지 않고 주입.
+				pstmt.setString(1, "%"+search.getKeyword()+"%");
+			}
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
@@ -228,19 +243,30 @@ public class UserDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		ArrayList<User> list = null;
+		String category = null;
+		Boolean isThereSearch = false;
 		
 		Search search = pagination.getSearch();
-		String where = "WHERE 1=1 ";
+		String where = " ";
 		
 		//Optional<String> optCategory = Optional.ofNullable(search.getCategory());
 		//optCategory.ifPresent((c) -> );
 		
-		if (search.getCategory() != null && !search.getCategory().equals("")) {
-			if (search.getKeyword() != null && search.getKeyword().equals("")) {
-				where += "AND " + search.getCategory() + " LIKE '%" + search.getKeyword() + "%'";
+		if (search.getCategory() != null && !search.getCategory().isEmpty()) {
+			if (search.getKeyword() != null && !search.getKeyword().isEmpty()) {
+				isThereSearch = true;
+				
+				switch(search.getCategory()) {
+					case "1" :
+						category = "u_id";
+						break;
+					case "2" :
+						category = "u_name";
+						break;
+				}
+				where = "WHERE " + category + " LIKE ? ";
 			}
 		}
-		
 		try {
 			conn = DBConnection.getConnection();
 			String query = new StringBuilder()
@@ -251,12 +277,20 @@ public class UserDAO {
 					.append(where)
 					.append("LIMIT			?, ?\n")
 					.toString();
-			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, pagination.getPageNum());
-			//System.out.println("페이지네이션 페이지넘 "+ pagination.getPageNum());
-			pstmt.setInt(2, pagination.getPageNum());
-			pstmt.setInt(3, Pagination.perPage);
-			//pstmt.setString(4, "%"+search.getKeyword()+"%");
+			//검색어가 있는 경우와 없는 경우 쿼리 ? 에 넣는 값을 다르게 함.
+			if (isThereSearch == true) {
+				pstmt = conn.prepareStatement(query);
+				pstmt.setInt(1, pagination.getPageNum());
+				pstmt.setString(2, "%"+search.getKeyword()+"%");
+				pstmt.setInt(3, pagination.getPageNum());
+				pstmt.setInt(4, Pagination.perPage);
+			} else {
+				pstmt = conn.prepareStatement(query);
+				pstmt.setInt(1, pagination.getPageNum());
+				pstmt.setInt(2, pagination.getPageNum());
+				pstmt.setInt(3, Pagination.perPage);
+			}
+
 			rs = pstmt.executeQuery();
 			list = new ArrayList<User>();
 			
@@ -269,7 +303,6 @@ public class UserDAO {
 				user.setU_tel(rs.getString("u_tel"));
 				user.setU_age(rs.getString("u_age"));
 				list.add(user);
-						
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -283,5 +316,38 @@ public class UserDAO {
 			}
 		}
 		return list;
+	}
+	
+	public User loginUser(String idx, String pw) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		User user = null;
+		try {
+			conn = DBConnection.getConnection();
+			String sql = "SELECT * FROM user WHERE u_id=? AND u_pw=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, idx);
+			pstmt.setString(2, pw);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				user = new User();
+				user.setU_idx(rs.getInt("u_idx"));
+				user.setU_pw(rs.getString("u_pw"));
+				user.setU_id(rs.getString("u_id"));
+				user.setU_name(rs.getString("u_name"));
+			}
+		}catch(Exception ex) {
+			System.out.println("SQLException : " + ex.getMessage());
+		}finally {
+			try {
+				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return user;
 	}
 }
