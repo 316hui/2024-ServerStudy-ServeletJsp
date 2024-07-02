@@ -20,8 +20,23 @@
 	div:nth-child(2) {
 		width:200px;
 	}
+	div ul {
+		width:100%;
+		text-align:center;
+		list-style:none;
+		padding:0;
+	}
+	div ul li {
+		padding:10px;
+		font-size:1rem;
+		background-color:rgba(75,189,217,0.1);
+		border-radius:10px;
+		margin:10px;
+		font_weight:700;
+		box-shadow:2px 3px 3px #bbbbbb;
+	}
 	div ul li a {
-	text0decoration:none;
+	text-decoration:none;
 	color:#333333;
 	}
 </style>
@@ -35,6 +50,5 @@ ${sessionScope.user.u_name }님
 		<li><a href="logout.do">로그아웃</a></li>
 	</ul>
 </div>
-<h1>${sessionScope.user.u_name}님 로그인 성공</h1>
 </body>
 </html>

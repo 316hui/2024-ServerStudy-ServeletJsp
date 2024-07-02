@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.lcomputerstudyy.service.BoardService;
 import com.lcomputerstudyy.service.UserService;
 import com.lcomputerstudyy.vo.Pagination;
 import com.lcomputerstudyy.vo.Search;
@@ -25,7 +26,6 @@ public class Controller extends HttpServlet {
 	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html; charset=utf-8");
 	
 		String requestURI = request.getRequestURI();
 		String contextPath = request.getContextPath();
@@ -45,6 +45,13 @@ public class Controller extends HttpServlet {
 		
 		String pw = null;
 		String idx = null;
+		HttpSession session;
+		command = checkSession(request, response, command);
+		
+		/*-------------------------------------------------------------게시물 관련변수들*/
+		BoardService boardService;
+		
+		
 		
 		switch (command) {
 		case "/user-list.do":
@@ -139,7 +146,7 @@ public class Controller extends HttpServlet {
 			view = "user/login";
 			break;
 		
-		case "/user-login/process.do" :
+		case "/user-login-process.do" :
 			idx = request.getParameter("login_id");
 			pw = request.getParameter("login_password");
 			
@@ -147,22 +154,66 @@ public class Controller extends HttpServlet {
 			user = userService.loginUser(idx, pw);
 			
 			if(user != null) {
-				HttpSession session = request.getSession();
+				session = request.getSession();
 				session.setAttribute("user", user);
 				
 				view = "user/login-result";
-			} else {
+			}else {
 				view = "user/login-fail";
 			}
-			
 			break;
-		}
 		
+		case "/logout.do":
+			session = request.getSession();
+			session.invalidate(); //세션을 무효화
+			view = "user/login";
+			break;
 		
+		case "/access-denied.do":
+			view = "user/access-denied";
+			break;
 			
+		/*---------------------------------------------------------------게시판 관련 컨트롤러 -----*/
 		
+		case "/board-list.do" :
+			boardService = BoardService.getInstance();
+			
+			int boardPage =
+			int boardCount = 
+			Pagination boardPagi = new Pagination();
+			boardPagi.setPage(page);
+			boardPagi.setCount(count);
+			boardPagi.build();
+			
+			
+			view = "board/list";
+			break;
+		}	
 		RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");
 		rd.forward(request, response);
 	}
+	
+	String checkSession(HttpServletRequest request, HttpServletResponse response, String command) {
+		HttpSession session = request.getSession();
+		
+		String[] authList = {
+				"/user-list.do"
+				,"/user-insert.do" 
+				,"/user-insert-process.do"
+				,"/user-detail.do"
+				,"/user-edit.do"
+				,"/user-edit-process.do"
+				,"/logout.do"
+		};
+		for (String item : authList) {
+			if (item.equals(command)) {
+				if (session.getAttribute("user") == null) {
+					command = "/access-denied.do";
+				}
+			}
+		}
+		return command;
+	}
+	
 	
 }
