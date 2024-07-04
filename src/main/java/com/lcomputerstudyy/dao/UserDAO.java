@@ -74,7 +74,6 @@ public class UserDAO {
 			String sql = "select * from user where u_idx=?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, u_idx);
-			//pstmt.executeUpdate();
 			
 			rs = pstmt.executeQuery();
 			while (rs.next()) {

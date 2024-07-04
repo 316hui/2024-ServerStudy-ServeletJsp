@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import com.lcomputerstudyy.service.BoardService;
 import com.lcomputerstudyy.service.UserService;
+import com.lcomputerstudyy.vo.Board;
 import com.lcomputerstudyy.vo.Pagination;
 import com.lcomputerstudyy.vo.Search;
 import com.lcomputerstudyy.vo.User;
@@ -50,7 +51,7 @@ public class Controller extends HttpServlet {
 		
 		/*-------------------------------------------------------------게시물 관련변수들*/
 		BoardService boardService;
-		
+		/*---------------------------------------------------------------------*/
 		
 		
 		switch (command) {
@@ -176,17 +177,46 @@ public class Controller extends HttpServlet {
 		/*---------------------------------------------------------------게시판 관련 컨트롤러 -----*/
 		
 		case "/board-list.do" :
+			String boardReqPage = request.getParameter("page");
+			if (boardReqPage != null)
+				page = Integer.parseInt(boardReqPage);
 			boardService = BoardService.getInstance();
 			
-			int boardPage =
-			int boardCount = 
-			Pagination boardPagi = new Pagination();
-			boardPagi.setPage(page);
-			boardPagi.setCount(count);
-			boardPagi.build();
+			Pagination boardPagination = new Pagination();
+			boardPagination.setPage(page);
+			count = boardService.getPostsCount(boardPagination);
+			boardPagination.setCount(count); //포스트갯수 입력
+			boardPagination.build();
 			
+			ArrayList<Board> boardList = boardService.getBoards(boardPagination);
+			//카운트는 제대로인데 얘가 못들고 옴
+			
+			request.setAttribute("list", boardList);
+			request.setAttribute("pagination", boardPagination);
 			
 			view = "board/list";
+			break;
+			
+		case "/board-detail.do" :
+			int b_idx = Integer.parseInt(request.getParameter("b_idx"));
+			boardService = BoardService.getInstance();
+			Board specificBoard = boardService.getBoard(b_idx);
+			
+			int writerIdx = Integer.parseInt(request.getParameter("u_idx"));
+			String writerName = boardService.getWriterName(writerIdx);
+			
+			request.setAttribute("specificBoard", specificBoard);
+			request.setAttribute("writerName", writerName);
+			
+			view = "board/detail";
+			break;
+			
+		case "/board-edit.do" :
+			view = "board/edit";
+			break;
+			
+		case "/board-delete.do" :
+			view = "board/delete";
 			break;
 		}	
 		RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");
