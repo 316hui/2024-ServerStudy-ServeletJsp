@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import com.lcomputerstudyy.database.DBConnection;
 import com.lcomputerstudyy.vo.Board;
 import com.lcomputerstudyy.vo.Pagination;
+import com.lcomputerstudyy.vo.User;
 
 public class BoardDAO {
 	private static BoardDAO dao = null;
@@ -102,7 +103,8 @@ public class BoardDAO {
 		
 		try {
 			conn = DBConnection.getConnection();
-			String sql = "select * from board where b_idx = ?";
+			String sql = "SELECT * FROM board ta LEFT JOIN user tb "
+					+ "ON ta.u_idx = tb.u_idx WHERE b_idx = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, b_idx);
 			rs = pstmt.executeQuery();
@@ -117,11 +119,16 @@ public class BoardDAO {
 				specificBoard.setB_views(rs.getInt("b_views"));
 				specificBoard.setU_idx(rs.getInt("u_idx"));
 				
+				User user = new User();
+				user.setU_name(rs.getString("u_name"));
+				specificBoard.setUser(user);
+				
 			}
 		}catch (Exception ex) {
 			ex.printStackTrace();
 		}finally {
 			try {
+				if(rs != null) pstmt.close();
 				if(pstmt != null) pstmt.close();
 				if (conn != null) conn.close();
 			}catch (SQLException e) {
@@ -131,18 +138,43 @@ public class BoardDAO {
 		return specificBoard;
 	}
 	
-	public String getWriterName(int writerIdx) {
-		String writerName = null;
-		
+	public void deleteBoard(int b_idx) {
 		try {
 			conn = DBConnection.getConnection();
-			String sql = "select u_name from user where u_idx = ?";
+			String sql = "DELETE FROM board WHERE b_idx = ?";
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, b_idx);
 			rs = pstmt.executeQuery();
-			
-			writerName = rs.getString("u_name");
 		}catch (Exception ex) {
 			ex.printStackTrace();
+		}finally {
+			try {
+				if(rs != null) pstmt.close();
+				if(pstmt!= null) pstmt.close();
+				if(conn!= null) conn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void updateBoard(Board board) {
+		try {
+			conn = DBConnection.getConnection();
+			String sql = "UPDATE board SET b_idx=?, b_title=?, b_content=?, b_date=?, b_views=?, u_idx=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, board.getB_idx());
+			pstmt.setString(2, board.getB_title());
+			pstmt.setString(3, board.getB_content());
+			java.sql.Timestamp date = java.sql.Timestamp.valueOf(board.getB_date());
+			pstmt.setTimestamp(4, date);
+			pstmt.setInt(5, board.getB_views());
+			pstmt.setInt(6, board.getUser().getU_idx());
+			pstmt.executeUpdate();
+		}catch (SQLException ex) {
+			ex.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
 		}finally {
 			try {
 				if(pstmt != null) pstmt.close();
@@ -151,7 +183,27 @@ public class BoardDAO {
 				e.printStackTrace();
 			}
 		}
-		return writerName;
 	}
+	
+	public void increaseViews(Board board) {
+		try {
+			conn = DBConnection.getConnection();
+			String sql = "UPDATE ? SET b_views = b_views+1";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.executeUpdate();
+		}catch (SQLException ex) {
+			ex.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt!= null) pstmt.close();
+				if(conn != null) conn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	
 }

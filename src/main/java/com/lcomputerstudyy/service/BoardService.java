@@ -27,8 +27,14 @@ public class BoardService {
 	public Board getBoard(int b_idx) {
 		return dao.getBoard(b_idx);
 	}
-	public String getWriterName(int writerIdx) {
-		return dao.getWriterName(writerIdx);
+	public void deleteBoard(int b_idx) {
+		dao.deleteBoard(b_idx);
+	}
+	public void updateBoard(Board board) {
+		dao.updateBoard(board);
+	}
+	public void increaseViews(Board board) {
+		dao.increaseViews(board);
 	}
 	
 }

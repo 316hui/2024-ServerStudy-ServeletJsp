@@ -10,6 +10,15 @@ public class Board {
 	private int b_views;
 	private int u_idx; //유저아이디
 	private int rownum;
+	private User user;
+	
+	
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
 	
 	
 	public int getB_idx() {

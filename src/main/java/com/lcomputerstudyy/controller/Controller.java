@@ -1,6 +1,8 @@
 package com.lcomputerstudyy.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -51,6 +53,7 @@ public class Controller extends HttpServlet {
 		
 		/*-------------------------------------------------------------게시물 관련변수들*/
 		BoardService boardService;
+		int b_idx = 0;
 		/*---------------------------------------------------------------------*/
 		
 		
@@ -198,25 +201,57 @@ public class Controller extends HttpServlet {
 			break;
 			
 		case "/board-detail.do" :
-			int b_idx = Integer.parseInt(request.getParameter("b_idx"));
+			b_idx = Integer.parseInt(request.getParameter("b_idx"));
 			boardService = BoardService.getInstance();
 			Board specificBoard = boardService.getBoard(b_idx);
-			
-			int writerIdx = Integer.parseInt(request.getParameter("u_idx"));
-			String writerName = boardService.getWriterName(writerIdx);
+			//boardService.increaseViews(specificBoard); //이거 내일 점검
 			
 			request.setAttribute("specificBoard", specificBoard);
-			request.setAttribute("writerName", writerName);
-			
 			view = "board/detail";
 			break;
 			
 		case "/board-edit.do" :
+			b_idx = Integer.parseInt(request.getParameter("b_idx"));
+			boardService = BoardService.getInstance();
+			Board beforeEditBoard = boardService.getBoard(b_idx);
+			
+			request.setAttribute("beforeEditBoard", beforeEditBoard);
 			view = "board/edit";
+			break;
+		
+		case "/board-after-edit.do" :
+			b_idx = Integer.parseInt(request.getParameter("b_idx"));
+			LocalDateTime b_date = LocalDateTime.parse(request.getParameter("b_date"));
+			int b_views = Integer.parseInt(request.getParameter(request.getParameter("b_views")));
+			u_idx = Integer.parseInt(request.getParameter(request.getParameter("u_idx")));
+			
+			Board afterEditBoard = new Board();
+			afterEditBoard.setB_idx(b_idx);
+			afterEditBoard.setB_title(request.getParameter("b_title"));
+			afterEditBoard.setB_content(request.getParameter("b_content"));
+			afterEditBoard.setB_date(b_date);
+			afterEditBoard.setB_views(b_views);
+			afterEditBoard.setU_idx(u_idx);
+			
+			boardService = BoardService.getInstance();
+			boardService.updateBoard(afterEditBoard);
+			
+			view = "board/after-edit";
 			break;
 			
 		case "/board-delete.do" :
+			b_idx = Integer.parseInt(request.getParameter("b_idx"));
+			boardService = BoardService.getInstance();
+			boardService.deleteBoard(b_idx);
+			
+			request.setAttribute("deletedBoardIdx", b_idx);
 			view = "board/delete";
+			break;
+		
+		case "/board-new.do" :
+			boardService = BoardService.getInstance();
+			//boardService.newBoard(board)
+			view = "board/new";
 			break;
 		}	
 		RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");

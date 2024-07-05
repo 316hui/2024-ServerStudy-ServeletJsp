@@ -77,12 +77,12 @@
 		</tr>
 		<tr>
 			<td>작성자</td>
-			<td>${writerName}</td>
+			<td>${specificBoard.user.u_name}</td>
 		</tr>
 		
 		<div class="button-container">
-        <button onclick="location.href='board-edit.do?b_idx=${specificBoard.b_idx}'">수정</button>
-        <button onclick="location.href='board-delete.do?b_idx=${specificBoard.b_idx}'">삭제</button>
+        	<button onclick="location.href='board-edit.do?b_idx=${specificBoard.b_idx}'">수정</button>
+        	<button onclick="location.href='board-delete.do?b_idx=${specificBoard.b_idx}'">삭제</button>
     	</div>
 	</table>
 </body>

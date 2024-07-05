@@ -68,11 +68,16 @@
         .back-button {
             margin-bottom: 20px;
         }
+        .add-button {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-	<div class="back-button">
-        <button onclick="goBack()">뒤로 가기</button>
+    <div class="add-button">
+        <a href="board-new.do">
+            <button>게시물 등록</button>
+        </a>
     </div>
 	<table>
 		 <caption style="caption-side: top; font-size: 24px; font-weight: bold; margin-bottom: 10px;">게시판</caption>
@@ -87,7 +92,7 @@
       
 			<c:forEach items="${list}" var="board" varStatus="status">
 				<tr>
-					<td><a href="board-detail.do?b_idx=${board.b_idx}&u_idx=${board.u_idx}">${board.rownum}</a></td>
+					<td><a href="board-detail.do?b_idx=${board.b_idx}">${board.rownum}</a></td>
 					<td>${board.b_title}</td>
 					<td>${board.b_content}</td>
 					<td>${board.b_views}</td>
@@ -95,9 +100,8 @@
 				
 			</c:forEach>
 		
-	</table>
-	
-	<!---pagination-->
+	</table>	
+<!---pagination-->
 	<div>
 		<ul>
 			<c:choose>
@@ -127,12 +131,5 @@
 			</c:choose>
 		</ul>
 	</div>
-	
-	<script>
-		function goBack() {
-			window.history.back();
-		}
-	</script>
 </body>
 </html>
-
