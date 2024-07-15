@@ -64,16 +64,15 @@
 		<form action="board-after-edit.do" method="POST">
 			<div class="form-group">
 				<label for="title">제목</label>
-				<input type="text" id="b_title" name="title" value="${beforeEditBoard.b_title}" required>
+				<input type="text" id="b_title" name="b_title" value="${beforeEditBoard.b_title}" required>
 			</div>
 			<div class="form-group">
 				<label for="content">내용</label>
-				<input type="text" id="b_content" name="content" value="${beforeEditBoard.b_content}" required>
+				<input type="text" id="b_content" name="b_content" value="${beforeEditBoard.b_content}" required>
 			</div>
-			<input type="hidden" id="b_date" name="date" value="${beforeEditBoard.b_date}">
-			<input type="hidden" id="b_views" name="views" value="${beforeEditBoard.b_views}">
-			<input type="hidden" id="u_idx" name="u_idx" value="${beforeEditBoard.user.u_idx}">
 			
+			<input type="hidden" id="b_idx" name="b_idx" value="${beforeEditBoard.b_idx}">
+	
 			<div class="form-group">
 				<button type="submit">수정 완료</button>
 			</div>

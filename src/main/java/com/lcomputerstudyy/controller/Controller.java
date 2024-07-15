@@ -3,6 +3,7 @@ package com.lcomputerstudyy.controller;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -157,6 +158,7 @@ public class Controller extends HttpServlet {
 			userService = UserService.getInstance();
 			user = userService.loginUser(idx, pw);
 			
+			
 			if(user != null) {
 				session = request.getSession();
 				session.setAttribute("user", user);
@@ -187,7 +189,7 @@ public class Controller extends HttpServlet {
 			
 			Pagination boardPagination = new Pagination();
 			boardPagination.setPage(page);
-			count = boardService.getPostsCount(boardPagination);
+			count = boardService.getPostsCount();
 			boardPagination.setCount(count); //포스트갯수 입력
 			boardPagination.build();
 			
@@ -204,7 +206,8 @@ public class Controller extends HttpServlet {
 			b_idx = Integer.parseInt(request.getParameter("b_idx"));
 			boardService = BoardService.getInstance();
 			Board specificBoard = boardService.getBoard(b_idx);
-			//boardService.increaseViews(specificBoard); //이거 내일 점검
+			
+			boardService.increaseViews(specificBoard); //상세확인 할떄마다 조회수 올림
 			
 			request.setAttribute("specificBoard", specificBoard);
 			view = "board/detail";
@@ -221,20 +224,18 @@ public class Controller extends HttpServlet {
 		
 		case "/board-after-edit.do" :
 			b_idx = Integer.parseInt(request.getParameter("b_idx"));
-			LocalDateTime b_date = LocalDateTime.parse(request.getParameter("b_date"));
-			int b_views = Integer.parseInt(request.getParameter(request.getParameter("b_views")));
-			u_idx = Integer.parseInt(request.getParameter(request.getParameter("u_idx")));
-			
-			Board afterEditBoard = new Board();
-			afterEditBoard.setB_idx(b_idx);
-			afterEditBoard.setB_title(request.getParameter("b_title"));
-			afterEditBoard.setB_content(request.getParameter("b_content"));
-			afterEditBoard.setB_date(b_date);
-			afterEditBoard.setB_views(b_views);
-			afterEditBoard.setU_idx(u_idx);
-			
 			boardService = BoardService.getInstance();
-			boardService.updateBoard(afterEditBoard);
+			Board beforeEditBoard2 = boardService.getBoard(b_idx);
+			
+			//b_idx = Integer.parseInt(request.getParameter("b_idx"));
+			//u_idx = Integer.parseInt(request.getParameter("u_idx"));
+			//String b_viewsParam = request.getParameter("b_views");
+			
+			beforeEditBoard2.setB_idx(b_idx);
+			beforeEditBoard2.setB_title(request.getParameter("b_title"));
+			beforeEditBoard2.setB_content(request.getParameter("b_content"));
+
+			boardService.updateBoard(beforeEditBoard2);
 			
 			view = "board/after-edit";
 			break;
@@ -247,11 +248,22 @@ public class Controller extends HttpServlet {
 			request.setAttribute("deletedBoardIdx", b_idx);
 			view = "board/delete";
 			break;
-		
-		case "/board-new.do" :
-			boardService = BoardService.getInstance();
-			//boardService.newBoard(board)
+			
+		case "/board-new.do":
 			view = "board/new";
+			break;
+		
+		case "/board-after-new.do" :
+			boardService = BoardService.getInstance();
+			session = request.getSession();
+			user = (User)session.getAttribute("user"); //유저세션을 못가져오고 있다
+			Board board = new Board();
+			board.setU_idx(user.getU_idx()); //세션 유저객체 통해 idx 가져오기
+			board.setB_content(request.getParameter("b_content"));
+			board.setB_title(request.getParameter("b_title"));
+			
+			boardService.newBoard(board);
+			view = "board/after-new";
 			break;
 		}	
 		RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");

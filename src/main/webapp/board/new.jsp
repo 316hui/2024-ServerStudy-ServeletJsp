@@ -61,15 +61,16 @@
 <body>
 	<div class="form-container">
 		<h2>게시물 등록</h2>
-		<form action="/board-new.do" method="POST">
+		<form action="board-after-new.do" method="POST">
 			<div class="form-group">
 				<div class="form-group">
-                <label for="title">제목</label>
-                <input type="text" id="b_title" name="title" required>
+	                <label for="title">제목</label>
+	                <input type="text" id="b_title" name="b_title" required>
+	            </div>
             </div>
             <div class="form-group">
                 <label for="content">내용</label>
-                <textarea id="b_content" name="content" required></textarea>
+                <textarea id="b_content" name="b_content" required></textarea>
             </div>
             <div class="form-group">
             	<button type="submit">등록 완료</button>

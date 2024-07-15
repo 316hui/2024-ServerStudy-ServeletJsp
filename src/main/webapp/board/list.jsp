@@ -39,36 +39,11 @@
         td a:hover {
             text-decoration: underline;
         }
-        ul.pagination {
-            display: flex;
-            list-style-type: none;
-            padding: 0;
-            justify-content: center;
-        }
-        ul.pagination li {
-            margin: 0 5px;
-        }
-        ul.pagination li a {
-            display: block;
-            padding: 8px 16px;
-            text-decoration: none;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        ul.pagination li a:hover {
-            background-color: #f2f2f2;
-        }
-        ul.pagination li.active span {
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #007bff;
-        }
+       
         .back-button {
             margin-bottom: 20px;
         }
-        .add-button {
+        .add-button, .login-button {
             margin-bottom: 10px;
         }
     </style>
@@ -77,6 +52,11 @@
     <div class="add-button">
         <a href="board-new.do">
             <button>게시물 등록</button>
+        </a>
+    </div>
+    <div class="login-button">
+        <a href="user-login.do">
+            <button>로그인</button>
         </a>
     </div>
 	<table>
@@ -104,31 +84,37 @@
 <!---pagination-->
 	<div>
 		<ul>
-			<c:choose>
-				<c:when test="${pagination.prevPage ge 5}">
+			 <c:choose>
+				<c:when test="${ pagination.prevPage ge 5}">
 					<li>
 						<a href="board-list.do?page=${pagination.prevPage}">
 							◀
 						</a>
 					</li>
 				</c:when>
-			</c:choose>
+			</c:choose> 
 			<c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}" step="1">
-				<c:choose>
-					<c:when test="${pagination.page eq i}">
-						<li style="background-color:#ededed;">
+				
+					<c:choose>
+						<c:when test="${ pagination.page eq i }">
+							<li style="background-color:#ededed;">
 								<span>${i}</span>
-						</li>
-					</c:when>
-				</c:choose>
+							</li>
+						</c:when>
+						<c:when test="${ pagination.page ne i }">
+							<li>
+								<a href="board-list.do?page=${i}&category=${pagination.search.category}&keyword=${pagination.search.keyword}">${i}</a>
+							</li>
+						</c:when>
+					</c:choose>
 			</c:forEach>
-			<c:choose>
-				<c:when test="${pagination.nextPage lt pagination.lastPage}">
+			 <c:choose>
+				<c:when test="${ pagination.nextPage lt pagination.lastPage }">
 					<li style="">
 						<a href="board-list.do?page=${pagination.nextPage}">▶</a>
 					</li>
 				</c:when>
-			</c:choose>
+			</c:choose> 
 		</ul>
 	</div>
 </body>

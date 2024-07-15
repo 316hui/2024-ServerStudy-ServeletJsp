@@ -43,7 +43,7 @@
 	</div>
 	<script>
 		function redirectToController() {
-			window.location.href = "/board-list.do";
+			window.location.href = "board-list.do";
 		}
 	</script>
 </body>

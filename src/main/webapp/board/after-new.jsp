@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-<title>게시물 수정 완료</title>
+<title>게시물 생성 완료</title>
  <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,7 +41,7 @@
 </head>
 <body>
 	<div class="message">
-		게시물이 성공적으로 수정되었습니다.
+		게시물이 성공적으로 생성되었습니다.
 	</div>
 	<div class="back-button">
         <a href="board-list.do">

@@ -25,7 +25,7 @@ public class BoardDAO {
 		}
 		return dao;
 	}
-	public int getPostsCount(Pagination boardPagination) {
+	public int getPostsCount() {
 		int count = 0;
 		
 		try {
@@ -161,15 +161,11 @@ public class BoardDAO {
 	public void updateBoard(Board board) {
 		try {
 			conn = DBConnection.getConnection();
-			String sql = "UPDATE board SET b_idx=?, b_title=?, b_content=?, b_date=?, b_views=?, u_idx=?";
+			String sql = "UPDATE board SET b_title=?, b_content=?, b_date= NOW() WHERE b_idx =?";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, board.getB_idx());
-			pstmt.setString(2, board.getB_title());
-			pstmt.setString(3, board.getB_content());
-			java.sql.Timestamp date = java.sql.Timestamp.valueOf(board.getB_date());
-			pstmt.setTimestamp(4, date);
-			pstmt.setInt(5, board.getB_views());
-			pstmt.setInt(6, board.getUser().getU_idx());
+			pstmt.setString(1, board.getB_title());
+			pstmt.setString(2, board.getB_content());
+			pstmt.setInt(3, board.getB_idx());
 			pstmt.executeUpdate();
 		}catch (SQLException ex) {
 			ex.printStackTrace();
@@ -188,8 +184,9 @@ public class BoardDAO {
 	public void increaseViews(Board board) {
 		try {
 			conn = DBConnection.getConnection();
-			String sql = "UPDATE ? SET b_views = b_views+1";
+			String sql = "UPDATE board SET b_views = b_views+1 WHERE b_idx=?";
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, board.getB_idx());
 			pstmt.executeUpdate();
 		}catch (SQLException ex) {
 			ex.printStackTrace();
@@ -198,6 +195,30 @@ public class BoardDAO {
 		}finally {
 			try {
 				if(pstmt!= null) pstmt.close();
+				if(conn != null) conn.close();
+			}catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	public void newBoard(Board board) {
+		try {
+			conn = DBConnection.getConnection();
+			String sql = "INSERT INTO board (b_title, b_content, b_date, b_views, u_idx)"
+					+ " VALUES(?, ?, NOW(), ?, ?)";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, board.getB_title());
+			pstmt.setString(2, board.getB_content());
+			pstmt.setInt(3, 0);
+			pstmt.setInt(4, board.getU_idx());
+			pstmt.executeUpdate();
+		}catch (SQLException ex) {
+			ex.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt != null) pstmt.close();
 				if(conn != null) conn.close();
 			}catch (SQLException e) {
 				e.printStackTrace();

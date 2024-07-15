@@ -50,6 +50,21 @@
         .button-container button:hover {
             background-color: #0056b3;
         }
+        .back-button {
+            margin-top: 20px;
+        }
+        .back-button button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .back-button button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -85,5 +100,11 @@
         	<button onclick="location.href='board-delete.do?b_idx=${specificBoard.b_idx}'">삭제</button>
     	</div>
 	</table>
+	
+	<div class="back-button">
+        <a href="board-list.do">
+            <button>돌아가기</button>
+        </a>
+    </div>
 </body>
 </html>
