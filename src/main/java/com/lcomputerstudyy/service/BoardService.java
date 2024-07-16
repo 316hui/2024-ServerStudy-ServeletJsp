@@ -18,8 +18,8 @@ public class BoardService {
 		}
 		return service;
 	}
-	public int getPostsCount() {
-		return dao.getPostsCount();
+	public int getPostsCount(Pagination boardPagination) {
+		return dao.getPostsCount(boardPagination);
 	}
 	public ArrayList<Board> getBoards(Pagination boardPagination) {
 		return dao.getBoards(boardPagination);

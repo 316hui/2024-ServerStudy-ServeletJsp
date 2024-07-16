@@ -182,6 +182,10 @@ public class Controller extends HttpServlet {
 		/*---------------------------------------------------------------게시판 관련 컨트롤러 -----*/
 		
 		case "/board-list.do" :
+			Search boardSearch = new Search();
+			boardSearch.setCategory(request.getParameter("category"));
+			boardSearch.setKeyword(request.getParameter("keyword"));
+			
 			String boardReqPage = request.getParameter("page");
 			if (boardReqPage != null)
 				page = Integer.parseInt(boardReqPage);
@@ -189,12 +193,12 @@ public class Controller extends HttpServlet {
 			
 			Pagination boardPagination = new Pagination();
 			boardPagination.setPage(page);
-			count = boardService.getPostsCount();
+			boardPagination.setSearch(boardSearch);
+			count = boardService.getPostsCount(boardPagination);
 			boardPagination.setCount(count); //포스트갯수 입력
 			boardPagination.build();
 			
 			ArrayList<Board> boardList = boardService.getBoards(boardPagination);
-			//카운트는 제대로인데 얘가 못들고 옴
 			
 			request.setAttribute("list", boardList);
 			request.setAttribute("pagination", boardPagination);
@@ -265,6 +269,7 @@ public class Controller extends HttpServlet {
 			boardService.newBoard(board);
 			view = "board/after-new";
 			break;
+			
 		}	
 		RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");
 		rd.forward(request, response);

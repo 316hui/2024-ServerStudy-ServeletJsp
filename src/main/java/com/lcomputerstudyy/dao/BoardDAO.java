@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import com.lcomputerstudyy.database.DBConnection;
 import com.lcomputerstudyy.vo.Board;
 import com.lcomputerstudyy.vo.Pagination;
+import com.lcomputerstudyy.vo.Search;
 import com.lcomputerstudyy.vo.User;
 
 public class BoardDAO {
@@ -25,13 +26,35 @@ public class BoardDAO {
 		}
 		return dao;
 	}
-	public int getPostsCount() {
+	public int getPostsCount(Pagination boardPagination) {
 		int count = 0;
+		Search search = boardPagination.getSearch();
+		String category = null;
+		Boolean isThereSearch = false;
 		
 		try {
 			String sql = "SELECT COUNT(*) count FROM board";
+			if(search.getCategory()!=null && !search.getCategory().isEmpty()) {
+				if(search.getKeyword()!=null && !search.getKeyword().isEmpty()) {
+					isThereSearch = true;
+					
+					switch(search.getCategory()){
+						case"1":
+							category = "b_title";
+							break;
+						case"2":
+							category = "b_content";
+							break;
+					}
+					sql += " WHERE " + category + " LIKE ?";
+				}
+			}
+			
 			conn = DBConnection.getConnection();
 			pstmt = conn.prepareStatement(sql);
+			if(isThereSearch==true) {
+				pstmt.setString(1, "%"+search.getKeyword()+"%");
+			}
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
@@ -50,24 +73,55 @@ public class BoardDAO {
 		}
 		return count;
 	}
+	
 	public ArrayList<Board> getBoards(Pagination boardPagination) {
 		ArrayList<Board> boardList = null;
+		String category = null;
+		Boolean isThereSearch = false;
+		Connection connection = null;
+		
+		Search search = boardPagination.getSearch();
+		String where = " ";
+		
+		if(search.getCategory()!=null && !search.getCategory().isEmpty()) {
+			if(search.getKeyword()!=null && !search.getKeyword().isEmpty()) {
+				isThereSearch=true;
+				
+				switch(search.getCategory()) {
+				case "1" :
+					category = "b_title";
+					break;
+				case "2" :
+					category = "b_content";
+					break;
+				}
+				where = "WHERE " + category + " LIKE ?";
+			}
+		}
 		try {
+			conn = DBConnection.getConnection();
 			String sql = new StringBuilder()
 					.append("SELECT 		@ROWNUM := @ROWNUM - 1 AS ROWNUM,\n")
 					.append("				ta.*\n")
 					.append("FROM 			board ta\n")
 					.append("INNER JOIN		(SELECT @ROWNUM := (SELECT	COUNT(*)-?+1 FROM board ta)) tb ON 1=1\n")
+					.append(where)
 					.append("LIMIT			?, ?\n")
 					.toString();
 			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, boardPagination.getPageNum());
-			pstmt.setInt(2, boardPagination.getPageNum());
-			pstmt.setInt(3, Pagination.perPage);
-			System.out.println(boardPagination.getPageNum() + " + " + Pagination.perPage);
+			if(isThereSearch==true) {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, boardPagination.getPageNum());
+				pstmt.setString(2, "%"+search.getKeyword()+"%");
+				pstmt.setInt(3, boardPagination.getPageNum());
+				pstmt.setInt(4, Pagination.perPage);
+			}else {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, boardPagination.getPageNum());		
+				pstmt.setInt(2, boardPagination.getPageNum());
+				pstmt.setInt(3, Pagination.perPage);
+			}
 			rs = pstmt.executeQuery();
-			
 			boardList = new ArrayList<Board>();
 			while(rs.next()) {
 				Board board = new Board();

@@ -59,6 +59,17 @@
             <button>로그인</button>
         </a>
     </div>
+    <div class="search-section">
+        <h2>검색</h2>
+        <form action="board-list.do" method="get">
+            <select name="category">
+                <option value="1">제목</option>
+                <option value="2">내용</option>
+            </select>
+            <input type="text" name="keyword" placeholder="검색어">
+            <button type="submit">검색</button>
+        </form>
+    </div>
 	<table>
 		 <caption style="caption-side: top; font-size: 24px; font-weight: bold; margin-bottom: 10px;">게시판</caption>
         <thead>
