@@ -277,7 +277,7 @@ public class Controller extends HttpServlet {
 	
 	String checkSession(HttpServletRequest request, HttpServletResponse response, String command) {
 		HttpSession session = request.getSession();
-		
+		// git test
 		String[] authList = {
 				"/user-list.do"
 				,"/user-insert.do" 
